@@ -44,7 +44,7 @@ class Weather extends React.Component {
                 <table>
                   {items.map(item => (
                     <tr>
-                    <td > {item.date} </td> <td> {item.temperatureC}C  </td>  <td>{item.summary}</td>
+                    <td > {item.date} </td> <td> {item.temperatureC}C </td>  <td>{item.summary}</td>
                     
                     </tr>
                   ))}
