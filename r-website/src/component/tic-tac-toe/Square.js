@@ -1,7 +1,13 @@
 import React from "react";
 import '../../css/square.css';
 class Square  extends React.Component {
-    state = {  }
+    constructor(props) {    
+        super(props);    
+        this.state = { value: null};  
+        }
+
+
+    
     render() { 
         return (
             <button className="square">

@@ -1,15 +1,23 @@
 import React from 'react';
-import Square from './Sqaure';
+import Square from './Square';
 import '../../css/board.css';
 
 
 class Board extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {Player: props.player};
+  }
+
+
+
+
     renderSquare(i) {
       return <Square />;
     }
   
     render() {
-      const status = 'Next player: X';
+      const status =<p>Next Player {this.state.Player}</p>
   
       return (
         <div>

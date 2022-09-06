@@ -4,8 +4,8 @@ import '../css/Games.css';
 function Games () {
     return ( 
         <div className="games">
-            <Tictactoe/>
-            <Chat/>
+            <div><Tictactoe/></div>
+            <div> <Chat/></div>
         </div>
      );
 }

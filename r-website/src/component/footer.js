@@ -5,7 +5,7 @@ class Footer extends React.Component {
       return (
         <footer className="footer">
         <p>Author: {this.props.Name}</p>
-        <p><a href="mailto:{this.props.Name}">{this.props.email}</a></p>
+        <p><a href={"mailto:"+this.props.email}>{this.props.email}</a></p>
         </footer>
       )
       
