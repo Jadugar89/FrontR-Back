@@ -1,5 +1,6 @@
 import React from 'react';
 import Square from './Square';
+import { HubConnectionBuilder } from "@microsoft/signalr";
 import '../../css/board.css';
 import {calculateWinner} from './helpFunction';
 
@@ -12,7 +13,35 @@ class Board extends React.Component {
       xIsNext: props.xIsNext,
       isWinner:false,
       AIMode: props.AIMode,
+      connect:null,
     };
+  }
+  componentDidMount()
+  {
+    if(this.state.AIMode)
+    {
+      const connect = new HubConnectionBuilder()
+      .withUrl("https://localhost:7047/hubs/TicTacToe")
+      .withAutomaticReconnect()
+      .build();
+
+    
+ 
+      this.setState({connect:connect});
+       connect.start().then(()=>
+        console.log("Conntected with Server")
+        
+      );
+    }
+
+  }
+  componentWillUnmount()
+  {
+   if(this.state.connect)
+    {
+      this.state.connect.stop();
+      console.log( this.state.connect.state);
+    }
   }
 
   handleClick(i) {    
@@ -26,6 +55,33 @@ class Board extends React.Component {
       );  
     }
 
+    async calculateMoveForAI()
+    {
+      if(this.state.connect)
+      {
+        if(this.state.connect._connectionStarted)
+        {
+          console.log("Funkcja Wysylania Status"+this.state.connect.state);
+          const TicTacToe_Message = {
+            board: this.state.squares
+        };
+        try {
+          await this.state.connect.send("SendMessage", TicTacToe_Message);
+        }
+        catch(e)
+        {
+          console.log(e);
+        }
+          
+
+        await this.state.connect.on("ReceiveMessage", (mess) => {
+          this.setState(this.state.squares[mess]= 'O')
+          this.renderSquare(mess);
+        });
+        }
+      }
+
+    }
 
     renderSquare(i) {
       return <Square value={this.state.squares[i]}
@@ -48,7 +104,24 @@ class Board extends React.Component {
         }
         else
         {
-          status =<p>Next Player {(this.state.xIsNext ? 'X' : 'O')}</p>;
+          if(this.state.AIMode)
+          {
+            if(this.state.xIsNext)
+            {
+              status =<p>Your Move</p>;
+            }
+            else
+            {
+              status =<p>Wait for Player AI</p>;
+              this.calculateMoveForAI();
+            }
+            
+          }
+          else
+          {
+            status =<p>Next Player {(this.state.xIsNext ? 'X' : 'O')}</p>;  
+          }
+         
         }
         
       }

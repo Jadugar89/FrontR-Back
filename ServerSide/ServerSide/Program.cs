@@ -1,3 +1,5 @@
+using ServerSide.SignalR_Hub;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -35,4 +37,5 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapHub<ChatHub>("/hubs/chat");
+app.MapHub<TicTacToeHub>("/hubs/TicTacToe");
 app.Run();
