@@ -12,7 +12,6 @@ class Tictactoe extends React.Component {
     this.handleStartClick = this.handleStartClick.bind(this);
     this.OnToogleChange = this.OnToogleChange.bind(this);
     this.StatusFun= this.StatusFun.bind(this);
-    this.Rand=this.Rand.bind(this);
     this.state = {isStarted: false,
                   AIMode:false,
     };
@@ -21,10 +20,6 @@ class Tictactoe extends React.Component {
 
     this.setState({isStarted: true});
     
-  }
-  Rand()
-  {
-    return Math.floor(Math.random()*2+1);
   }
   StatusFun(value){
     this.setState({isStarted: value});
@@ -43,10 +38,7 @@ class Tictactoe extends React.Component {
       if(this.state.isStarted)
       {
         GameStarted=  <div><p>Game is Started!!!</p></div>;
-       
-        let xIsNextRand= this.Rand()===1 ? true : false;
-        BoardReady=<Board xIsNext={xIsNextRand} 
-                          StatusFun={this.StatusFun}
+        BoardReady=<Board StatusFun={this.StatusFun}
                           AIMode={this.state.AIMode}
         />
       }

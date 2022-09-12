@@ -10,7 +10,7 @@ class Board extends React.Component {
     this.StatusFun= this.props.StatusFun.bind(this)
     this.state = {
       squares: Array(9).fill(null),
-      xIsNext: props.xIsNext,
+      xIsNext: true,
       isWinner:false,
       AIMode: props.AIMode,
       connect:null,
@@ -18,6 +18,8 @@ class Board extends React.Component {
   }
   componentDidMount()
   {
+    let xIsNextRand= this.Rand()===1 ? true : false;
+    this.setState({xIsNext:xIsNextRand});
     if(this.state.AIMode)
     {
       const connect = new HubConnectionBuilder()
@@ -28,13 +30,26 @@ class Board extends React.Component {
     
  
       this.setState({connect:connect});
-       connect.start().then(()=>
-        console.log("Conntected with Server")
-        
-      );
+       connect.start().then(()=>{
+        console.log("Conntected with Server");
+        if(!this.state.xIsNext)
+        {
+          this.calculateMoveForAI();
+        }
+      });
     }
 
   }
+  componentDidUpdate(prevProps, prevState, snapshot)
+  {
+    if(this.state.AIMode && prevState.xIsNext && !this.state.xIsNext && !this.state.isWinner)
+          {
+            this.calculateMoveForAI();
+          }
+    
+  }
+
+
   componentWillUnmount()
   {
    if(this.state.connect)
@@ -42,6 +57,10 @@ class Board extends React.Component {
       this.state.connect.stop();
       console.log( this.state.connect.state);
     }
+  }
+  Rand()
+  {
+    return Math.floor(Math.random()*2+1);
   }
 
   handleClick(i) {    
@@ -52,10 +71,11 @@ class Board extends React.Component {
     squares[i] =  this.state.xIsNext ? 'X' : 'O';
     this.setState({squares: squares,
                   xIsNext: !this.state.xIsNext}
-      );  
+      ); 
+
     }
 
-    async calculateMoveForAI()
+    calculateMoveForAI()
     {
       if(this.state.connect)
       {
@@ -66,7 +86,7 @@ class Board extends React.Component {
             board: this.state.squares
         };
         try {
-          await this.state.connect.send("SendMessage", TicTacToe_Message);
+           this.state.connect.send("SendMessage", TicTacToe_Message);
         }
         catch(e)
         {
@@ -74,9 +94,11 @@ class Board extends React.Component {
         }
           
 
-        await this.state.connect.on("ReceiveMessage", (mess) => {
-          this.setState(this.state.squares[mess]= 'O')
-          this.renderSquare(mess);
+           this.state.connect.on("ReceiveMessage", (mess) => {
+            const squares = this.state.squares.slice();  
+            squares[mess]='O';
+            this.setState({squares: squares,
+              xIsNext: !this.state.xIsNext})
         });
         }
       }
@@ -112,8 +134,8 @@ class Board extends React.Component {
             }
             else
             {
+             
               status =<p>Wait for Player AI</p>;
-              this.calculateMoveForAI();
             }
             
           }
