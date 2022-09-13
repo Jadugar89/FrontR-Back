@@ -5,7 +5,7 @@ import ReadUser from '../component/readUsers';
 function Home() {
     return (
         <div className="home">
-            <Greeting name="Sara"/>
+            <Greeting name="Somebody"/>
             <ReadUser></ReadUser>
         </div>
 );

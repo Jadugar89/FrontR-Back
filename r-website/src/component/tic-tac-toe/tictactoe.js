@@ -53,7 +53,7 @@ class Tictactoe extends React.Component {
         <div className="game">
           <div className="game-info">
            {GameStarted}
-           <ToggleSwitch labelSelected="Player AI"  labelUnselected="Player"
+           <ToggleSwitch label="Player AI"
                          OnChangeHandler={this.OnToogleChange} 
                          disabled={this.state.isStarted} 
                          checked={this.state.AIMode}/>
