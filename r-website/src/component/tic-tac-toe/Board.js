@@ -2,7 +2,6 @@ import React from 'react';
 import Square from './Square';
 import { HubConnectionBuilder } from "@microsoft/signalr";
 import '../../css/board.css';
-import {calculateWinner} from './helpFunction';
 
 class Board extends React.Component {
   constructor(props) {
@@ -12,6 +11,7 @@ class Board extends React.Component {
       squares: Array(9).fill(null),
       xIsNext: true,
       isWinner:false,
+      winner:null,
       AIMode: props.AIMode,
       connect:null,
     };
@@ -20,35 +20,37 @@ class Board extends React.Component {
   {
     let xIsNextRand= this.Rand()===1 ? true : false;
     this.setState({xIsNext:xIsNextRand});
-    if(this.state.AIMode)
-    {
+   
       const connect = new HubConnectionBuilder()
       .withUrl("https://localhost:7047/hubs/TicTacToe")
       .withAutomaticReconnect()
       .build();
 
-    
- 
       this.setState({connect:connect});
        connect.start().then(()=>{
         console.log("Conntected with Server");
-        if(!this.state.xIsNext)
-        {
-          this.calculateMoveForAI();
-        }
-      });
-    }
 
+        if(!this.state.xIsNext && this.state.AIMode)
+          {
+          this.calculateMoveForAI();
+          }
+      });
+      
   }
+
   componentDidUpdate(prevProps, prevState, snapshot)
   {
     if(this.state.AIMode && prevState.xIsNext && !this.state.xIsNext && !this.state.isWinner)
-          {
-            this.calculateMoveForAI();
-          }
-    
+    {
+      this.calculateMoveForAI();
+    }
+    if(prevState.squares!==this.state.squares)
+    {
+      this.CheckWinner();
+      this.setState({xIsNext:!this.state.xIsNext});    
+    }
   }
-
+  
 
   componentWillUnmount()
   {
@@ -65,62 +67,94 @@ class Board extends React.Component {
 
   handleClick(i) {    
     const squares = this.state.squares.slice();    
-    if (calculateWinner(squares) || squares[i]) {   
+    if (this.state.isWinner || squares[i]!==null) {   
       return;    
     }
     squares[i] =  this.state.xIsNext ? 'X' : 'O';
-    this.setState({squares: squares,
-                  xIsNext: !this.state.xIsNext}
-      ); 
-
+                  this.setState({squares: squares}); 
+                 
     }
 
     calculateMoveForAI()
     {
       if(this.state.connect)
       {
-        if(this.state.connect._connectionStarted)
+        if(this.state.connect._connectionStarted && !this.state.isWinner)
         {
-          console.log("Funkcja Wysylania Status"+this.state.connect.state);
-          const TicTacToe_Message = {
+            console.log("Funkcja Wysylania Status"+this.state.connect.state);
+            const TicTacToe_Message = {
             board: this.state.squares
-        };
+            };
         try {
-           this.state.connect.send("SendMessage", TicTacToe_Message);
+           this.state.connect.send("SendMessage", TicTacToe_Message).then(()=>{
+            this.state.connect.on("ReceiveMessage", (mess) => {
+              const squares = this.state.squares.slice();  
+              squares[mess]='O';
+              this.setState({squares: squares});
+            });
+          });
         }
         catch(e)
         {
           console.log(e);
-        }
-          
-
-           this.state.connect.on("ReceiveMessage", (mess) => {
-            const squares = this.state.squares.slice();  
-            squares[mess]='O';
-            this.setState({squares: squares,
-              xIsNext: !this.state.xIsNext})
-        });
+        }   
         }
       }
-
+    }
+    async CheckWinner()
+    {
+      if(this.state.connect._connectionStarted)
+      {
+        const TicTacToe_Message = {
+          board: this.state.squares
+      };
+  
+        await this.state.connect.send("isWinner",TicTacToe_Message).then(()=>{
+          this.state.connect.on("isWinner",(mess)=>{
+  
+            if(mess.isWinner)
+            {
+              let Winner = 0;
+              if( mess.winner>0)
+              {
+                Winner="O";
+              }
+              if( mess.winner<0)
+              {
+                Winner="X";
+              }
+  
+              this.setState({isWinner:mess.isWinner,
+                            winner:Winner}
+             );
+            }
+          })});
+        }
     }
 
     renderSquare(i) {
+      let disabled= false;
+      if(this.state.AIMode)
+      {
+        disabled=!this.state.xIsNext;
+      }
       return <Square value={this.state.squares[i]}
                      onClick={() => this.handleClick(i)}
+                     disabled={disabled}
       />;
     }
   
     render() {
 
-      const winner = calculateWinner(this.state.squares);    
+       
       let status;    
-      if (winner && winner!== -1) {     
-         status = 'Winner: ' + winner;
+      if (this.state.isWinner && this.state.winner!== 0 ) {   
+         
+         status = 'Winner: ' + this.state.winner
       }
       else
       {
-        if(winner=== -1)
+        if(this.state.isWinner && this.state.winner===0)
         {
           status = 'No one is a Winner! ';
         }
@@ -142,19 +176,15 @@ class Board extends React.Component {
           else
           {
             status =<p>Next Player {(this.state.xIsNext ? 'X' : 'O')}</p>;  
-          }
-         
-        }
-        
+          }     
+        } 
       }
       let EndGameBtn= null;
-      if(winner)
+      if(this.state.isWinner)
       {
         EndGameBtn  = <button onClick={()=>this.StatusFun(false)}>End Game </button>
       }
       
-       
-  
       return (
         <div>
           <div className="status">{status}</div>

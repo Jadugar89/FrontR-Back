@@ -12,7 +12,8 @@ function Square(props) {
       }
       return (
             <button className={styleforsquare}
-            onClick={() => props.onClick()}>
+            onClick={() => props.onClick()}
+            disabled={props.disabled}>
             {props.value}
           </button>
           );   

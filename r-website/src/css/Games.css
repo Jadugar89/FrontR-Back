@@ -13,10 +13,10 @@
     text-align: left;
 }
 .ChatWindow{
-    max-height: 50vh;
-    border-width: 5px;
+    
+    height: 50vh;
     border-radius: 20px;
-    border-color: chocolate;
+    border-color: black;
     border-style: solid;
 
     scroll-snap-align: start;
