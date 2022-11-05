@@ -21,7 +21,7 @@
         {
             int bestVal = int.MinValue;
             int bestMove = -1;
-            if (_ticTacToe.calculateWinner(0) != 0)
+            if (_ticTacToe.calculateWinner(0) == 0)
             {
                 for (int i = 0; i < 3; i++)
                 {
