@@ -19,13 +19,9 @@ stages:
     - job: BuildServer
       steps:
         - task: NuGetToolInstaller@1
-          inputs:
-             versionSpec: '4.6.0'
         - task: NuGetCommand@2
           inputs:
-            command: 'restore'
             restoreSolution: '**/*.sln'
-            feedsToUse: 'select'
         - task: UseDotNet@2
           displayName: 'Download .Net 6'
           inputs:
