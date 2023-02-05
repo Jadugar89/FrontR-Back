@@ -61,7 +61,7 @@ stages:
             azureSubscription: 'FrontR-Back'
             appType: 'webApp'
             appName: 'FrontR-Back'
-            package: '$(System.DefaultWorkingDirectory)/*.zip'
+            package: '$(Build.ArtifactStagingDirectory)/*.zip'
 
 
 
