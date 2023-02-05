@@ -209,10 +209,6 @@ UpgradeLog*.htm
 
 # Microsoft Fakes
 FakesAssemblies/
-
-<<<<<<< HEAD
-.vscode/settings.json
-=======
 .vscode/settings.json
 
 # dependencies
@@ -236,4 +232,3 @@ FakesAssemblies/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
->>>>>>> efe77b6 (Update .gitignore)
