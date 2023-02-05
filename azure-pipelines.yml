@@ -56,6 +56,12 @@ stages:
           inputs:
             targetPath: '$(Build.ArtifactStagingDirectory)' 
             artifactName: 'FrontR-Back'
+        - task: AzureWebApp@1
+          inputs:
+            azureSubscription: 'FrontR-Back'
+            appType: 'webApp'
+            appName: 'FrontR-Back'
+            package: '$(Build.ArtifactStagingDirectory)/*.zip'
 
 
 
