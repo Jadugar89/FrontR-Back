@@ -4,12 +4,16 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-
 //Enable CORS
-builder.Services.AddCors(c =>
+builder.Services.AddCors(options =>
 {
-    c.AddPolicy("AllowOrigin", options => options.WithOrigins("http://localhost:3000").AllowAnyMethod()
-     .AllowAnyHeader().AllowCredentials()); 
+    options.AddPolicy("FrontEndClient", builderPolicy =>
+
+        builderPolicy.AllowAnyMethod()
+            .AllowAnyHeader()
+            .WithOrigins(builder.Configuration["AllowedOrigins"])
+
+        );
 });
 
 builder.Services.AddSignalR();
@@ -22,11 +26,8 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-app.UseCors(options => 
-options.AllowAnyMethod()
-       .AllowAnyHeader()
-       .WithOrigins("http://localhost:3000")
-       .AllowCredentials());
+app.UseCors("FrondEndClient");
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
