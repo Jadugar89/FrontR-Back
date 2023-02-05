@@ -4,7 +4,19 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
 
 trigger:
-- main
+ branches:
+    include:
+      - '*'
+ paths:
+  include:
+   - FrontR-Back/r-website/*
+pr:
+ branches:
+  include:
+   - main
+ paths:
+  include:
+   - FrontR-Back/r-website/*
 
 variables:
 
