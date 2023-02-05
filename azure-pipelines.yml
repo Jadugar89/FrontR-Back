@@ -4,7 +4,16 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
 
 trigger:
-- main
+ paths:
+  include:
+   - FrontR-Back/ServerSide/*
+pr:
+ branches:
+  include:
+   - main
+ paths:
+  include:
+   - FrontR-Back/ServerSide/*
 
 pool:
   vmImage: ubuntu-latest
